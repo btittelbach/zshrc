@@ -1,0 +1,48 @@
+#!/bin/zsh
+#ogg/flac to mp3 with bitrate of 192. preserves basic tags.
+check_com lame || exit 1
+
+emulate -L zsh
+setopt extendedglob
+unsetopt ksharrays
+
+local -a DECODE id3tags
+local -A tagmap
+local tagdata OUTPUT_DIR
+local RC=0
+tagmap=("(#l)title" --tt "(#l)artist" --ta "(#l)tracknumber" --tn "(#l)genre" --tg "(#l)album" --tl)
+
+zparseopts -D -E "o:=OUTPUT_DIR"
+[[ -d ${OUTPUT_DIR[2]} ]] && OUTPUT_DIR=${OUTPUT_DIR[2]} || unset OUTPUT_DIR
+
+if [[ ${@[(i)*.ogg]} -le ${#@} ]] && ! check_com oggdec; then
+    echo "ERROR: please install oggdec" >&2
+    return 1
+fi
+if [[ ${@[(i)*.flac]} -le ${#@} ]] && ! check_com flac; then
+    echo "ERROR: please install flac" >&2
+    return 1
+fi
+
+for af in "$@"; do
+    id3tags=()
+    case "$af" in
+        (*.flac)
+            DECODE=(flac -d -c "$af")
+            tagdata="$(metaflac --export-tags-to=- "$af")"
+            ;;
+        (*.ogg)
+            DECODE=(oggdec -Q -o - "$af")
+            tagdata="$(ogginfo "$af")"
+            ;;
+        (*) continue ;;
+    esac
+    for line (${(f)tagdata}) \
+        [[ "$line" == (#s)[[:space:]]#(#b)([^=]##)=(*)(#e) && -n $tagmap[(k)$match[1]] ]] && \
+            id3tags+=($tagmap[(k)$match[1]] "$match[2]")
+    [[ ${#id3tags} -gt 0 ]] && id3tags=(--add-id3v2 --ignore-tag-errors $id3tags)
+    (( ${+OUTPUT_DIR} )) && TARGETMP3="${OUTPUT_DIR}/${af:t:r}.mp3" || TARGETMP3="${af:r}.mp3"
+    $DECODE[*] | lame -b 192 -v -h --replaygain-fast "${id3tags[@]}" - "$TARGETMP3" || {RC=$?; print "Error transcoding" "${af}"; }
+done
+# return 0 if no error or exit code if at least one error happened
+return $RC

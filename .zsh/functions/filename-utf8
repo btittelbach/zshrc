@@ -1,0 +1,33 @@
+## on a utf-8 system convert filenames with invalid encoding to utf-8
+
+#function filename-utf8
+#{
+  while [[ -n "$1" ]]; do
+    local FULLFILE="$*"
+    if [[ ! -e "$FULLFILE" ]] ; then
+      echo "$FULLFILE not found" >&2
+      continue
+    fi
+    local FILE=$(basename "$FULLFILE")
+    local DIR=${FULLFILE%$FILE}
+    local ENCODING="$(echo $FILE | file -)"
+    if [[ "$ENCODING" == "/dev/stdin: ISO-8859 text" || "$ENCODING" == "/dev/stdin: ISO-8859 English text" ]]; then
+      local NEWNAME="$(echo $FILE | recode ISO8859-15..UTF-8)"
+      [[ "$FILE" != "$NEWNAME" ]] &&  mv -iv "${DIR}${FILE}" "${DIR}${NEWNAME}"
+    elif [[ "$ENCODING" == "/dev/stdin: ASCII text" ]]; then
+      
+    elif [[ "$ENCODING" == "/dev/stdin: UTF-8 Unicode text" ]]; then
+      
+    elif [[ "$ENCODING" == "/dev/stdin: UTF-8 Unicode English text" ]]; then
+      
+    elif [[ "$ENCODING" == "/dev/stdin: ASCII English text" ]]; then
+      
+    elif [[ "$ENCODING" == "/dev/stdin: ASCII troff or preprocessor input text" ]]; then
+      
+    else
+      echo "Unknown Encoding: $ENCODING at $FULLFILE" >&2
+    fi 
+    shift
+  done
+#}
+

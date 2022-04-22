@@ -1,0 +1,14 @@
+#!/bin/zsh
+## calls meld to compare current git worktree and given commit
+## 
+## add as command "git meld <commit>" by setting:
+## # git config alias.meld '!~/.zsh/functions/git-meld'
+## assuming that's where you saved this script
+
+[[ -x =meld && -x =git ]] || {print "ERROR: git or meld not available!"; return 1 }
+local tmpdir=$(mktemp -d)
+trap "rm -Rf \"$tmpdir\"" EXIT
+local git_toplevel="$(git rev-parse --show-toplevel)"
+local branch=${1-HEAD}
+git archive --format=tar "$branch" | tar -x -C "$tmpdir" || return 2
+meld "$git_toplevel" "${tmpdir}"

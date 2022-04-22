@@ -1,0 +1,7 @@
+# list all processes sorted by number of open files
+# (c) Bernhard Tittelbach, 2021
+emulate -L zsh
+setopt extendedglob
+
+$SUDO lsof | tail -n+1 | cut -d' ' -f 1| uniq -c | sort -n -k1
+

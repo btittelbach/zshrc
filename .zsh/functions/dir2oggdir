@@ -1,0 +1,58 @@
+#!/bin/zsh
+#flac to ogg recoder, moves directory structure to phone
+check_com oggenc || exit 1
+
+emulate -L zsh
+setopt extendedglob
+unsetopt ksharrays
+
+zparseopts -D -E "o:=OUTPUT_DIR" "r:=REMOVEPATH"
+[[ -d ${OUTPUT_DIR[2]} ]] && OUTPUT_DIR=${OUTPUT_DIR[2]} || unset OUTPUT_DIR
+[[ -d ${REMOVEPATH[2]} ]] && REMOVEPATH=${REMOVEPATH[2]} || unset REMOVEPATH
+
+local -A transformators
+
+cp_transform_flac2ogg() {
+  local in="$1"
+  local out="${2:r}.ogg"
+  oggenc -q 5 -o "$out" "$in"
+}
+
+cp_transform_skip() {
+  echo "skipping $1"
+  return 0
+}
+
+cp_transform_ifcover() {
+  local in="$1"
+  local out="$2"
+  [[ $in == (#i)cover*jpg || $in == (#i)folder*jpg ]] && cp -v "$in" "$out" || return 0
+}
+
+#jpg: just copy if cover/folder
+transformators[jpg]=cp_transform_ifcover
+#mp3: just copy
+#ogg: just copy
+#flac
+transformators[flac]=cp_transform_flac2ogg
+#mood: skip
+transformators[mood]=cp_transform_skip
+transformators[txt]=cp_transform_skip
+transformators[cue]=cp_transform_skip
+
+local -i rplen
+[[ -n $REMOVEPATH ]] && rplen=${#REMOVEPATH} || rplen=0
+echo $((rplen++)) >/dev/null
+
+for ad in "$@"; do
+  [[ ! -d $ad ]] && continue
+  for af in "${ad}"/**/*(.); do
+    local ext="${af:e:l}"
+    local tf=${transformators[$ext]}
+    tf=${tf:-cp -v}
+    #local adlen=${#ad}
+    local outfile=$OUTPUT_DIR/"${af[rplen,-1]}"
+    [[ ! -e ${outfile:h} ]] && mkdir -p "${outfile:h}"
+    [[ ! -e ${outfile} ]] && ${(z)tf} "$af" "${outfile}"
+  done
+done

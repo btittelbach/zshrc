@@ -1,0 +1,12 @@
+# retrieve weather information on the console
+# Usage example: 'weather graz'
+
+emulate -L zsh
+
+if [[ -z "$1" ]]; then
+    print 'Usage: weather <city>'
+    return 0
+fi
+
+curl "http://v2.wttr.in/$1" "http://wttr.in/$1"
+

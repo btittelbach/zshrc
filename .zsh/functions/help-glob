@@ -1,0 +1,105 @@
+## An extensive globbing reference, inspired by GRML, separated into pages
+# set GLOB_HELP_PAGE=0 in .zshrc.local
+
+#help-glob() {
+local -a glob_help_pages
+  local num_glob_help_pages
+  glob_help_pages[1]="  =<cmd>   expand executable cmd to full path
+  <m-n>    number between m and n. m and n can be left blank
+  (a)#     equals (a)* in RE
+  (a|b)##  equals (a|b)+ in RE
+  ~B       files not matching B
+  A~B~C    files matching A but not B and not C
+  
+globbing flags (affects following chars):
+  (#i)     case insensitive. OFF: (#I)
+  (#l)     lower case match upper case but not vice versa
+  (#b)     backreferences into \$match array. OFF: (#B)
+  (#a<n>)  approximate match, <n> errors allowed
+  (#s)     equals ^ in RE
+  (#e)     equals \$ in RE
+ print **/*.c          # Alle *.c - Dateien unterhalb von \$PWD
+ print **/*.c~file.c   # Alle *.c - Dateien, aber nicht 'file.c'
+ print (foo|bar).*     # Alle Dateien mit 'foo' und / oder 'bar' am Anfang
+ print *~*.*           # Nur Dateien ohne '.' in Namen
+ print -l *(.c|.h)     # Nur Dateien mit dem Suffix '.c' und / oder '.h'"
+  
+  glob_help_pages[2]="extended glob qualifiers <pattern>([^]<qualifers>) :
+   /      directories
+   F      filled directories
+   .      plain files
+   @      symbolic links
+   =      sockets
+   p      named pipes (FIFOs)
+   *      executable plain files (0100)
+   %      device files (character or block special)
+   %b     block special files
+   %c     character special files
+   r      owner-readable files (0400)
+   w      owner-writable files (0200)
+   x      owner-executable files (0100)
+   A      group-readable files (0040)
+   I      group-writable files (0020)
+   E      group-executable files (0010)
+   R      world-readable files (0004)
+   W      world-writable files (0002)
+   X      world-executable files (0001)
+   s      setuid files (04000)
+   S      setgid files (02000)
+   t      files with the sticky bit (01000)
+ rmdir **/*(/^F)       # rmdir all empty directories
+ chmod 644 *(.^x)      # make all non-executable files publically readable
+ print **/*(g:users:)  # Alle Dateien/Verzeichnisse der Gruppe >users<"
+ 
+ glob_help_pages[3]="extended glob qualifiers <pattern>([^]<qualifers>) :
+   u<u>   owned by user (<u> is UID or :username:)
+   g<g>   owned by group (<g> is GID or :groupname:)
+   D      include .files in *
+   N      NULL_GLOB: substitute empty string if no match
+   d<d>   files on device <d>
+   L<n>   files of size <n> Byte (use Lk,Lm,Lg for KiB,MiB,GiB)
+   m<n>   files modified <n> days ago (use mM,mh,mm for Months,Hours,Minutes)
+   a<n>   files accesssed <n> days ago
+   c<n>   files whose inode metadata changed <n> days ago
+          (prepend <n> with +/- for at-least/at-most)
+   e:exp: filter \w expression or function exp (using \$REPLY)
+   ,      OR-combinate qualifiers, e.g.: (L-2,L+4) ~= (^L3)
+   ^      invert following qualifier
+   o/O_   sort in ascending/descending order by qualifier _
+      n      by names
+      L      by filesize
+      m/a/c  by file modification/access/metadata-modification time
+      d      files from subdirectories first
+   [m]    only return m'th result (can be negative)
+   [m,n]  only return results m to n
+ print *(m-1)          # Dateien, die vor bis zu einem Tag modifiziert wurden.
+ print *(a1)           # Dateien, auf die vor einem Tag zugegriffen wurde.
+ print *(Lk+50)        # Dateien die ueber 50 Kilobytes grosz sind
+ print *(Lk-50)        # Dateien die kleiner als 50 Kilobytes sind"
+ 
+  glob_help_pages[4]="Modifiers: <pattern>(<qlf>:<modifier>:<modifier2>)
+   a      turn filename into absolute path
+   A      like a but resolve symbolic links too
+   t      only show basename (tail of filepath)
+   h      only show directories (head) of filepath (== dirname)
+   e      only show extension of filename
+   r      remove extension, only show root of filename
+   q      quote
+   x      quote, but separate on whitespace
+   Q      remove one level of quotes
+   l      convert to lowercase
+   u      convert to uppercase
+   s/l/r  substitute l with r once. Use gs/l/r for global subst.
+ echo /proc/*/cwd(:h:t:s/self//) # Analog zu >ps ax | awk '{print $1}'<
+ 
+Modifier modifiers: (:<modifier modifier><modifier>)
+   f      repeat following modifier until no more changes happen
+   F:exp: like f but only n times if exp evaluates to n
+   w      make following modifier work on each word in string
+   w:sep: like w but words are separated by sep"
+ 
+  num_glob_help_pages=${#glob_help_pages}
+  GLOB_HELP_PAGE=$(( (GLOB_HELP_PAGE % num_glob_help_pages)+1 ))
+  zle -M $glob_help_pages[GLOB_HELP_PAGE]
+#}
+

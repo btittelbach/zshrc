@@ -1,0 +1,13 @@
+hash -d by-label=/dev/disk/by-label
+hash -d by-id=/dev/disk/by-id
+hash -d by-uuid=/dev/disk/by-uuid
+hash -d r3=~/realraum
+hash -d c=/var/lib/machines
+
+if [[ -e /usr/lib/udisks2 ]]; then
+  hash -d m=/media/$USER/
+else
+  hash -d m=/media/
+fi
+
+

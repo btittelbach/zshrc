@@ -1,0 +1,16 @@
+#!/bin/zsh
+TEMPDIR=$(mktemp -d)
+trap "rm -Rf $TEMPDIR/" EXIT
+zparseopts -D -E "o:=OUTPUT_FILE"
+
+[[ -z $OUTPUT_FILE ]] && exit 1
+
+local NUM=1
+local EXT=${1:e}
+for f in "$@"; do
+  cp "$f" ${TEMPDIR}/$(printf "%03d." $NUM)${EXT}
+  NUM=$((NUM+1))
+done
+ls -la $TEMPDIR
+avconv -r 2/1 -f image2 -i $TEMPDIR/'%03d.'"$EXT"  "${OUTPUT_FILE[2]}"
+

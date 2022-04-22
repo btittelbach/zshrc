@@ -1,0 +1,19 @@
+## character recode a filename, e.g.: filename-recode latin1..utf-8 *
+#function filename-recode
+#{
+  local FORMAT=$1
+  shift
+  while [[ -n "$1" ]]; do
+    local FULLFILE="$1"
+    if [[ ! -e $FULLFILE ]] ; then
+      echo "$FULLFILE not found" >&2
+      continue
+    fi
+    local FILE="${FULLFILE:t}"
+    local DIR="${FULLFILE:h}"
+    NEWNAME="$(echo -n "${FILE}" | /usr/bin/recode "${FORMAT}")"
+    [[ "$FILE" != "$NEWNAME" ]] && /bin/mv -iv "${FULLFILE}" "${DIR}/${NEWNAME}"
+    shift
+  done
+#}
+
