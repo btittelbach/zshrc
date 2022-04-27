@@ -472,6 +472,10 @@ alias lsblka="lsblk -t -o NAME,SIZE,TYPE,MODEL,PARTUUID,UUID,LABEL,MOUNTPOINT"
 #alias killfirefox="killall GeckoMain"
 alias killfirefox="killall /usr/lib/firefox/firefox"
 
+### Negative Aliases / unalias grml stuff 
+
+check_com up && unalias up ## if ultimate-pipe is in path, unalias apt upgrade
+
 ### Suffix Aliases ########################
 
 ### Global Aliases  ########################
@@ -1354,6 +1358,11 @@ zle -N help-glob && bindkey '^xg' help-glob
 
 if check_com fzf; then
 if [[ $- == *i* && $- == *i* ]]; then
+
+## load z from https://github.com/rupa/z
+if [[ -r ~/source/z/z.sh ]]; then
+  . ~/source/z/z.sh
+fi
 
 # Key bindings
 # ------------
