@@ -680,13 +680,13 @@ function gitAC
 function gitCP
 {
   zparseopts -D -E -a git_both_opts -- "v"
-  zparseopts -D -E -a git_push_opts -- "-all" "-force" "f" "-mirror"
+  zparseopts -D -E -a git_push_opts -- "-all" "-mirror" "f" "-force" "-force-with-lease"
   command git commit ${git_both_opts[*]} $* && command git push ${git_both_opts[*]} ${git_push_opts[*]}
 }
 function gitACP
 {
   zparseopts -D -E -a git_both_opts -- "v" "f"
-  zparseopts -D -E -a git_push_opts -- "-all" "-mirror" "-force"
+  zparseopts -D -E -a git_push_opts -- "-all" "-mirror" "-force" "-force-with-lease"
   gitAC ${git_both_opts[*]} $* && command git push ${git_both_opts[*]} ${git_push_opts[*]}
 }
 function gitInOut
