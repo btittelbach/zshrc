@@ -102,8 +102,8 @@ setopt MAGIC_EQUAL_SUBST
 ## Brace {a-z} Character Expansion
 setopt BRACE_CCL
 
-export HISTSIZE=100000000
-export SAVEHIST=10000000
+export HISTSIZE=200000000
+export SAVEHIST=20000000
 export HISTFILE=$HOME/.zsh_history
 
 ## define word separators (for stuff like backward-word, forward-word, backward-kill-word,..)
