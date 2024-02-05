@@ -829,6 +829,32 @@ function catFileSkipLine
 }
 alias delFileLine="catFileSkipLine -i"
 
+## remove offendind host key for previously failed ssh command
+## by using ssh-keygen -R host with host from previous CL or tmux buffer
+function ssh-keygen-R-auto
+{
+  setopt XTRACE
+  ## dump tmux buffer and grep for ssh-keygen lines
+  if ((${+TMUX})); then
+    local TMPFILE=$(mktemp)
+    trap "rm -f $TMPFILE" EXIT
+    tmux -q capture-pane -b 0 \; save-buffer -b 0 $TMPFILE \; delete-buffer -b 0
+    local sshkeygencmd=(${(Q)$(grep -E '^  ssh-keygen -f .* -R .*$' "$TMPFILE" | tail -n 1)})
+  fi
+
+  ## if no ssh-keygen line was found
+  ## parse a hostname out of last CL in case it was a ssh command
+  if [[ -z $sshkeygencmd ]]; then
+    local prevCL="${history[@][1]}"
+    if [[ $prevCL =~ "ssh[^\#&;]*[@ ]((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9]))($|;|&|#| )" ]]; then
+      local sshkeygencmd=(ssh-keygen -R $match[1])
+    else
+      return 1
+    fi
+  fi
+  [[ -n $sshkeygencmd ]] && ${sshkeygencmd}
+}
+
 ## zed zshell editor with help
 function zedwhelp
 {
@@ -1271,7 +1297,6 @@ function safecp
 }
 alias safemv="safecp --mv"
 
-
 ### Additional Keybindings and keyboard related stuff ########################
 
 ## ctrl-s will no longer freeze the terminal.
@@ -1343,6 +1368,7 @@ if [[ $- == *i* && $- == *i* ]]; then
 if [[ -r ~/source/z/z.sh ]]; then
   . ~/source/z/z.sh
 fi
+
 
 # Key bindings
 # ------------
