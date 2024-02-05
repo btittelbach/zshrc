@@ -759,11 +759,7 @@ function waitpid
   local PID=$1
   local CMD="`ps -p $PID -o command=`"
   echo Waiting on ${PID}: ${CMD}
-  if check_com inotifywait; then
-    inotifywait -e CLOSE -qq /proc/${PID}/fd/0
-  else
-    while { CCMD="`ps -p $PID -o command=`" && [[ "${CCMD}" == "${CMD}" ]] } ; do sleep 30; done
-  fi
+  while { [[ -d /proc/${PID}/ ]] } ; do sleep 1; done
 }
 compdef _pids waitpid
 
