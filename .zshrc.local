@@ -746,29 +746,10 @@ if check_com pdftotext ; then
 fi
 
 ## Send File as Attachement with Thunderbird
-if check_com thunderbird; then
+if check_com xdg-email; then
   function Mail
   {
-    setopt HIST_SUBST_PATTERN
-    #:a      convert to absolute filepaths
-    #:s/#/   prepend file://
-    #(j:,:)  join array elements with ,
-    local ATTACHEMENTS=${(j:,:)@:a:s/#/file:\/\//}
-    local PTB=(=thunderbird(N:A)) || PTB=""
-    local USE_FJ=0
-    if check_com firejail; then
-      local PFJ=(=firejail(N:A))
-      if [[ -n $PFJ && $PTB == $PFJ ]]; then
-        USE_FJ=1
-      fi
-    fi
-    if (( USE_FJ == 1 )); then
-      local ALLOWREADFILES=${(j:,:)@:a:s/#/--whitelist=/}
-      local DISALLOWWRITEREADFILES=${(j:,:)@:a:s/#/--read-only=/}
-      firejail ${DISALLOWWRITEREADFILES[@]} ${ALLOWREADFILES[@]} -- $PTB -compose "attachment='${ATTACHEMENTS}'"
-    else
-      thunderbird -compose "attachment='${ATTACHEMENTS}'"
-    fi
+    xdg-email --attach "$@"
   }
 fi
 ## Wait for termination of a process, given by its PID, that is not a child of this shell
