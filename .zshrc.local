@@ -399,15 +399,13 @@ alias lld='ll -d'
 alias unix2dos='recode lat1..ibmpc'
 alias dos2unix='recode ibmpc..lat1'
 ## ssh/scp allow sha1
-alias sshsha1='ssh -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1'
-alias scpsha1='scp -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1'
+alias sshsha1='ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa -o KexAlgorithms=curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1'
+alias scpsha1='scp -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedKeyTypes=+ssh-rsa -o KexAlgorithms=curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1'
 ## ssh/scp without Host Key Checking and allowance for sha1
 alias sshu='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1'
 alias scpu="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o KexAlgorithms=curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1"
 ## force ssh password authentification
 alias sshp='ssh -o PubkeyAuthentication=false -o PreferredAuthentications=keyboard-interactive'
-##
-alias sshviaomoikane='ssh -o ProxyCommand="ssh omoikane.tittelbach.at exec nc %h %p"'
 ## handy on gentoo
 alias smerge='emerge --update --keep-going --reinstall changed-use --ask system'
 alias wmerge='emerge --update --keep-going --deep --reinstall changed-use --ask --with-bdeps y world'
