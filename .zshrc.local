@@ -472,7 +472,7 @@ alias killfirefox="killall /usr/lib/firefox/firefox"
 
 ### Negative Aliases / unalias grml stuff 
 
-check_com up && unalias up ## if ultimate-pipe is in path, unalias apt upgrade
+check_com up && alias up &>/dev/zero && unalias up ## if ultimate-pipe is in path, unalias apt upgrade
 
 ### Suffix Aliases ########################
 
