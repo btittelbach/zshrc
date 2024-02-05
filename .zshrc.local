@@ -558,6 +558,11 @@ stm32f4erase-stlink () {
   $SUDO openocd -f /usr/share/openocd/scripts/interface/stlink-v2.cfg -f /usr/share/openocd/scripts/target/stm32f4x.cfg -c "tcl_port 0" -c "telnet_port 0" -c "gdb_port 0" -c "init" -c "reset halt" -c "wait_halt" -c "stm32f4x mass_erase 0" -c "reset halt" -c "exit"
 }
 
+stm32flash-blackmagicprobe-elf () {
+  local LIKELY_PORT=( /dev/ttyACM*([-2]) )
+  arm-none-eabi-gdb -nx --batch -ex "target extended-remote ${LIKELY_PORT}" -ex 'monitor swdp_scan' -ex 'attach 1' -ex 'load' -ex 'compare-sections' -ex 'kill' $1
+}
+
 
 function watchzsh
 {
