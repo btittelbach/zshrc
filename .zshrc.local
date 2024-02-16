@@ -829,11 +829,10 @@ function catFileSkipLine
 }
 alias delFileLine="catFileSkipLine -i"
 
-## remove offendind host key for previously failed ssh command
+## remove offending ssh-host-key for previously failed ssh command
 ## by using ssh-keygen -R host with host from previous CL or tmux buffer
 function ssh-keygen-R-auto
 {
-  setopt XTRACE
   ## dump tmux buffer and grep for ssh-keygen lines
   if ((${+TMUX})); then
     local TMPFILE=$(mktemp)
